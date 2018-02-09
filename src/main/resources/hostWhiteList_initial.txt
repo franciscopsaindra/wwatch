@@ -1,0 +1,1 @@
+# List of host names whose requests will not be decorated. Note that redirecion will take place if necessary

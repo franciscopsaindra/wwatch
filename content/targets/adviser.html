@@ -1,0 +1,42 @@
+<div id="w9vpopup" style="display: block; position: fixed; z-index: 10 !important; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgb(233,241,244); background-color: rgba(233,241,244,0.7);">
+
+	<div style="margin: 15% auto; padding: 20px; border: 0px solid #888; width: 80%;font-family:Tahoma, Geneva, sans-serif;color:#005d86;background-color: rgb(233,241,244);">
+
+		<div id="w9vheader" style="height:57px;background-color:#005d86;width:100%;text-align:left">
+			<span style="display:inline-block;height:100%;vertical-align:middle;"></span>
+			<img src="/947008c4-20ab-426d-9087-10c1b04266e7/targets/images/telefonica_logo.jpg" style="vertical-align:middle;" alt="telefonica" width="137" height="39" border="0" />
+			<span id="w9vclose" style="float:right;height:100%;vertical-align:middle;text-align:right;color:white;font-size:24px">X&nbsp;</span>
+		</div>
+		<div id="w9vtext" style="font-size:12px;margin-left:20%; margin-right:20%;">
+			<br>
+			<strong>Estimado cliente:</strong><br/>
+			Queremos informarle que al d&iacute;a de hoy registramos factura/s impaga/s en su cuenta. Solicitamos la regularizaci&oacute;n del pago a fin de evitar la futura suspensi&oacute;n del servicio.
+			<br>
+			<br>
+			Dir&iacute;jase <a href="#" style="color:#005d86;text-decoration: underline;">aqu&iacute;</a> para m&aacute;s informaci&oacute;n
+			<br>
+			<br>
+		</div>
+		<div id="w9vfooter" style="height:57px;background-color: #005d86;">
+		</div>
+	</div>
+</div>
+<script>
+// When the user clicks on <span> (x), close the modal
+var w9popup=document.getElementById["w9vpopup"]
+var w9close=document.getElementById["w9vclose"]
+w9vclose.onclick = function() {
+    w9vpopup.style.display = "none";
+}
+
+w9vclose.onmouseover = function() {
+    this.style.color="black";
+	this.style.cursor="pointer";
+}
+
+w9vclose.onmouseout = function() {
+    this.style.color="white";
+	this.style.cursor="auto";
+}
+</script>
+
