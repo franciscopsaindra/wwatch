@@ -18,6 +18,10 @@ libraryDependencies ++=
     "ch.qos.logback" 	%  "logback-classic" % "1.2.3"
   )
   
+unmanagedClasspath in Compile += baseDirectory.value / "src" / "universal" / "content"
+unmanagedClasspath in Runtime += baseDirectory.value / "src" / "universal" / "content"
+  
 scriptClasspath += "../conf"
+scriptClasspath += "../content"
 
 

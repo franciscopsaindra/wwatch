@@ -18,8 +18,9 @@ object Content {
   
   val config = ConfigFactory.load()
   
-  // Will hold the absolute path of the content directory
-  val contentDirectory = new File(config.getString("wwatch.content.directory"))
+  // The content directory will be the one where the resource "redirect.html" is located  
+  val contentDirectory = new File(getClass.getClassLoader.getResource("redirect.html").getPath).getParentFile
+  
   // Map(String -> (ByteString, ContentType)]
   val objectMap = getObjectMap(contentDirectory, contentDirectory)
   
