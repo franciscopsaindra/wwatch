@@ -15,12 +15,16 @@
 
 	<root level="INFO">        
     	<appender-ref ref="STDOUT" />
+    	<!-- 
     	<appender-ref ref="FILE" />
+    	-->
   	</root>
   	
   	<logger name="wwatch" level="DEBUG" additivity="false">
   		<appender-ref ref="STDOUT" />
+  		<!-- 
   		<appender-ref ref="FILE" />
+  		-->
   	</logger>
 
 </configuration>
