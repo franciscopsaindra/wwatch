@@ -136,7 +136,7 @@ object WebServer extends App {
     log.info(s"Binding Proxy Server to $bindPort")
     val futureBinding = Http().bind("0.0.0.0", bindPort).to(Sink.foreach{connection => connection.handleWithAsyncHandler(requestHandler, 1)}).run()
     // Wait for key input
-    StdIn.readLine()
+    //StdIn.readLine()
     
     // Terminate
     futureBinding.onComplete(_ => actorSystem.terminate()) 

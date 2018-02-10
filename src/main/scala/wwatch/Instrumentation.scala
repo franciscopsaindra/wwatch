@@ -151,6 +151,6 @@ class Instrumentation extends Actor {
       case Failure(e) =>
          log.error(e.getMessage)
     }
-  } else log.info("Instrumentation not started")
+  } else log.info("Instrumentation not bound to external port")
   
 }
