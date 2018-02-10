@@ -39,6 +39,8 @@ object UserData {
    * 	specialService: acs|reject|pcautiv|betatester
    * 	pubCampaign: <campaign-name>
    * }
+   * 
+   * A custom JsonProtocol is needed because the case class to serialize includes fields and methods not in the constructor
    */
   object MyJsonProtocol extends DefaultJsonProtocol {
     implicit object userInfoFormat extends RootJsonFormat[UserInfo]  {

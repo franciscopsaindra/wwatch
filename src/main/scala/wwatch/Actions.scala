@@ -17,10 +17,10 @@ object Actions {
   
   
   // Get the list of hosts to force redirect/block/free
-  val hostBlackList = Source.fromResource("hostBlackList_initial.txt").getLines.filter(line => !line.isEmpty() && !line.trim.startsWith("#")).toSet ++ Source.fromResource("hostBlackList.txt").getLines.filter(line => !line.isEmpty()).toSet
-  val hostWhiteList = Source.fromResource("hostWhiteList_initial.txt").getLines.filter(line => !line.isEmpty() && !line.trim.startsWith("#")).toSet ++ Source.fromResource("hostWhiteList.txt").getLines.filter(line => !line.isEmpty()).toSet
+  val hostBlackList = Source.fromResource("hostBlackList_initial.txt").getLines.filter(line => !line.isEmpty() && !line.trim.startsWith("#")).toSet ++ (if(Source.fromResource("hostBlackList.txt")!=null) Set() else Source.fromResource("hostBlackList.txt").getLines.filter(line => !line.isEmpty()).toSet)
+  val hostWhiteList = Source.fromResource("hostWhiteList_initial.txt").getLines.filter(line => !line.isEmpty() && !line.trim.startsWith("#")).toSet ++ (if(Source.fromResource("hostWhiteList.txt")!=null) Set() else Source.fromResource("hostWhiteList.txt").getLines.filter(line => !line.isEmpty()).toSet)
   // Support not yet implemented
-  val hostFreeList = Source.fromResource("hostFreeList_initial.txt").getLines.filter(line => !line.isEmpty() && !line.trim.startsWith("#")).toSet ++ Source.fromResource("hostFreeList.txt").getLines.filter(line => !line.isEmpty()).toSet
+  val hostFreeList = Source.fromResource("hostFreeList_initial.txt").getLines.filter(line => !line.isEmpty() && !line.trim.startsWith("#")).toSet ++ (if(Source.fromResource("hostFreeList.txt") != null) Set() else Source.fromResource("hostFreeList.txt").getLines.filter(line => !line.isEmpty()).toSet)
   
   def hostInWhiteList(req: HttpRequest) = req.header[Host].map(h => hostWhiteList.contains(h.value)).getOrElse(false)
   

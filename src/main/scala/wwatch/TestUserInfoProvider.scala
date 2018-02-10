@@ -27,10 +27,10 @@ class TestUserInfoProvider extends Actor {
   
   val route = path("userInfo") {
     get {
-      log.debug("Asked for UserInfo")
+      log.debug("UserInfo request received")
       val jsonResponse = JsObject(
           "isBlocked" -> false.toJson,
-          //"specialService" -> proxyResponseMap.toMap.toJson,
+          //"specialService" -> JsString("acs"),
           "pubCampaign" -> JsString("adviser")
           )
           
