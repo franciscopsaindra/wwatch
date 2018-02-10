@@ -133,13 +133,13 @@ object WebServer extends App {
     
     // Start server
     val bindPort = sys.env.getOrElse("PORT", config.getString("wwatch.server.redirectorListenPort")).toInt
-    log.info(s"Binding Proxy Server to $bindPort")
+    log.info(s"Binding Proxy Server to port $bindPort")
     val futureBinding = Http().bind("0.0.0.0", bindPort).to(Sink.foreach{connection => connection.handleWithAsyncHandler(requestHandler, 1)}).run()
     // Wait for key input
-    //StdIn.readLine()
+    // StdIn.readLine()
     
     // Terminate
-    futureBinding.onComplete(_ => actorSystem.terminate()) 
+    // futureBinding.onComplete(_ => actorSystem.terminate()) 
   
   } catch {
     case e: Throwable =>
