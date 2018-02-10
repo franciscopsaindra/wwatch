@@ -1,1 +1,1 @@
-worker: target/universal/stage/bin/wwatch
+web: target/universal/stage/bin/wwatch
