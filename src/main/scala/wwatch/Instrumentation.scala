@@ -140,12 +140,17 @@ class Instrumentation extends Actor {
   implicit val actorSystem = context.system
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = actorSystem.dispatcher
+  
+  // Disable this if run in Heroku
+  val bindPort = config.getInt("wwatch.server.instrumentationListenPort")
+  if(bindPort != 0) {
   val bindFuture = Http().bindAndHandle(route, "0.0.0.0", config.getInt("wwatch.server.instrumentationListenPort"))
-  bindFuture.onComplete {
-    case Success(b) =>
-      log.info("Bound")
-    case Failure(e) =>
-       log.error(e.getMessage)
-  }
+    bindFuture.onComplete {
+      case Success(b) =>
+        log.info("Bound")
+      case Failure(e) =>
+         log.error(e.getMessage)
+    }
+  } else log.info("Instrumentation not started")
   
 }

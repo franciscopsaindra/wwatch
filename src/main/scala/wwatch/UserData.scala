@@ -90,10 +90,13 @@ class UserData(instrumentationActor: ActorRef) extends Actor {
   
   val clientCacheEvictorPeriodMillis = config. getLong("wwatch.userInfo.clientCacheEvictorPeriodMillis")
   val userCacheTimeMillis = config.getLong("wwatch.userInfo.userCacheTimeMillis")
-  val clientInfoURL = config.getString("wwatch.userInfo.userInfoURL")
+  val userInfoURL = config.getString("wwatch.userInfo.userInfoURL")
   
-  // Start test actor
-  val userInfoProviderActor = context.actorOf(TestUserInfoProvider.props, "TestUserInfo")
+  // Start test actor if needed
+  if(config.getBoolean("wwatch.userInfo.mokeupUserInfoServer")){
+    log.info("Starting mokeup UserInfo Server")
+    val userInfoProviderActor = context.actorOf(TestUserInfoProvider.props, "TestUserInfo")
+  } else log.info("Not starting mokeup UserInfo Server")
   
   // Holds the client cache
   val ipAddressMap = scala.collection.mutable.Map[String, UserInfo]()
@@ -105,6 +108,7 @@ class UserData(instrumentationActor: ActorRef) extends Actor {
   
   def receive = {
     case Evictor() =>
+      // Periodically clean the userData cache
       val targetTimestamp = System.currentTimeMillis() - userCacheTimeMillis
       ipAddressMap.retain((k, v) => v.creationTime > targetTimestamp)
       context.system.scheduler.scheduleOnce(clientCacheEvictorPeriodMillis milliseconds, self, Evictor())
@@ -114,22 +118,26 @@ class UserData(instrumentationActor: ActorRef) extends Actor {
         
       (ipAddressMap.get(ipAddress) match {
         case None =>
-          instrumentationActor ! ReportUserInfoRequest()
-          (for {
-            response <- Http(context.system).singleRequest(HttpRequest(uri=clientInfoURL.replaceAll("$ipAddress", ipAddress)))
-            jsonString <- Unmarshal(response).to[String]
-            ui = jsonString.parseJson.convertTo[UserInfo]
-          } yield ui).recover {
-            // Fill in case of error
-            case _ => 
-              log.warning("Error retrieving ClientInfo for IPAddress {}", ipAddress)
-              instrumentationActor ! ReportUserInfoError()
-              UserInfo(false, None, None)
-          } map ( userInfo => {
-            // Push to cache
-            ipAddressMap.put(ipAddress, userInfo)
-            userInfo
-          })
+          if(userInfoURL.contains("http")){
+            instrumentationActor ! ReportUserInfoRequest()
+            (for {
+              response <- Http(context.system).singleRequest(HttpRequest(uri = userInfoURL.replaceAll("$ipAddress", ipAddress)))
+              jsonString <- Unmarshal(response).to[String]
+              ui = jsonString.parseJson.convertTo[UserInfo]
+            } yield ui).recover {
+              // Fill in case of error
+              case _ => 
+                log.warning("Error retrieving ClientInfo for IPAddress {}", ipAddress)
+                instrumentationActor ! ReportUserInfoError()
+                UserInfo(false, None, None)
+            } map ( userInfo => {
+              // Push to cache
+              ipAddressMap.put(ipAddress, userInfo)
+              userInfo
+            })
+          }
+          // In mokeup userInfo the campaign is "adviser"
+          else Future.successful(UserInfo(false, None, Some("adviser")))
           
         case Some(userInfo) =>
           Future.successful(userInfo)
