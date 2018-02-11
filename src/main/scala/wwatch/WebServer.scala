@@ -31,6 +31,8 @@ object WebServer extends App {
   val log = Logging.getLogger(actorSystem, this)
   val workLog = Logging.getLogger(actorSystem, "work")
   
+  val expiresHeader = Expires(DateTime(0))
+  
   try {
     
     val config = ConfigFactory.load()
@@ -118,7 +120,8 @@ object WebServer extends App {
                             case _ =>
                             resp
                         }
-                        decodedResponse.transformEntityDataBytes(decoratorFlows(userInfo.pubCampaign.get + ".html"))
+                        decodedResponse.removeHeader("Expires").addHeader(expiresHeader)
+                          .transformEntityDataBytes(decoratorFlows(userInfo.pubCampaign.get + ".html"))
                       }
                       // Error getting user data. Send proxy reply unchanged
                       else resp 
@@ -136,10 +139,10 @@ object WebServer extends App {
     log.info(s"Binding Proxy Server to port $bindPort")
     val futureBinding = Http().bind("0.0.0.0", bindPort).to(Sink.foreach{connection => connection.handleWithAsyncHandler(requestHandler, 1)}).run()
     // Wait for key input
-    // StdIn.readLine()
+    StdIn.readLine()
     
     // Terminate
-    // futureBinding.onComplete(_ => actorSystem.terminate()) 
+    futureBinding.onComplete(_ => actorSystem.terminate()) 
   
   } catch {
     case e: Throwable =>
