@@ -24,10 +24,11 @@ unmanagedClasspath in Runtime += baseDirectory.value / "src" / "universal" / "co
 scriptClasspath += "../conf"
 scriptClasspath += "../content"
 
+/*
 javaOptions in Universal ++= Seq(
     // -J params will be added as jvm parameters
     "-J-Xmx300m",
     "-J-Xss512k"
 )
-
+*/
 
