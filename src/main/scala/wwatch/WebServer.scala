@@ -15,18 +15,21 @@ import com.typesafe.config._
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
+import scala.util.{Try, Success, Failure}
 
 import scala.io.StdIn
 
 import Actions._
 import Content._
 import Instrumentation._
+import TestWebProvider._
 
 object WebServer extends App {
   
   implicit val actorSystem = ActorSystem()
   implicit val materializer = ActorMaterializer()
   implicit val executionContext = actorSystem.dispatcher
+  //implicit val executionContext = actorSystem.dispatchers.lookup("my-dispatcher")
   
   val log = Logging.getLogger(actorSystem, this)
   val workLog = Logging.getLogger(actorSystem, "work")
@@ -46,6 +49,9 @@ object WebServer extends App {
     
     // Start UserInfo retriever
     val userInfoActor = actorSystem.actorOf(UserData.props(instrumentationActor), "UserData")
+    
+    // Start mokeup web server
+    if(config.getBoolean("wwatch.testWeb.enable")) actorSystem.actorOf(TestWebProvider.props, "TestWebProvider")
       
     // Flow to apply to responses that will be decorated
     def decoratorFlow(targetObject: String) = {
@@ -64,6 +70,7 @@ object WebServer extends App {
     val decoratorFlows = Content.getObjects
       .filter {case (name, contents) => name.startsWith("targets/")}
       .map {case (name, contents) => (name.replaceFirst("targets/", ""), decoratorFlow(name))}
+      
       
     val requestHandler : (HttpRequest) => Future[HttpResponse] = {
       (req) => {
@@ -100,7 +107,8 @@ object WebServer extends App {
                 workLog.info("ACTION_PROXY,{},{}", req.hashCode, req.uri)
                 instrumentationActor ! ReportRequest(ACTION_PROXY, requestedHost, remoteAddress)
                 
-                Http().singleRequest(req.removeHeader("Timeout-Access").addHeader(`X-Forwarded-For`(addressHeader)).removeHeader("Remote-Address")).map(resp => {
+                
+                Http().singleRequest(req.removeHeader("Timeout-Access").addHeader(`X-Forwarded-For`(addressHeader)).removeHeader("Remote-Address"), settings = akka.http.scaladsl.settings.ConnectionPoolSettings(config)).map(resp => {
                   workLog.info("PROXY REPLY,{}", req.hashCode)
                   instrumentationActor ! ReportProxyResponse(resp.status.intValue)
                   responseAction(resp, Actions.hostInWhiteList(req)) match {
@@ -136,13 +144,18 @@ object WebServer extends App {
     
     // Start server
     val bindPort = sys.env.getOrElse("PORT", config.getString("wwatch.server.redirectorListenPort")).toInt
-    log.info(s"Binding Proxy Server to port $bindPort")
-    val futureBinding = Http().bind("0.0.0.0", bindPort).to(Sink.foreach{connection => connection.handleWithAsyncHandler(requestHandler, 1)}).run()
+    
+    val futureBinding = Http().bindAndHandleAsync(requestHandler, "0.0.0.0", bindPort)
+    futureBinding.onComplete {
+      case Success(binding) =>
+        log.info("Proxy server bound to port " + binding.localAddress)
+      case Failure(e) =>
+        log.error(e, "Proxy server not started")
+    }
+    
     // Wait for key input
     StdIn.readLine()
-    
-    // Terminate
-    futureBinding.onComplete(_ => actorSystem.terminate()) 
+    actorSystem.terminate() 
   
   } catch {
     case e: Throwable =>

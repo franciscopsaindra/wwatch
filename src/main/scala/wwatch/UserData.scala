@@ -79,8 +79,6 @@ class UserData(instrumentationActor: ActorRef) extends Actor {
   import MyJsonProtocol._
   import akka.http.scaladsl.unmarshalling.Unmarshal
   
-  //implicit val userInfoFormat = jsonFormat3(UserInfo)
-  
   implicit val executionContext = context.dispatcher
   implicit val materializer = ActorMaterializer()
   

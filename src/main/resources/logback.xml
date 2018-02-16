@@ -20,7 +20,14 @@
     	-->
   	</root>
   	
-  	<logger name="wwatch" level="DEBUG" additivity="false">
+  	<logger name="wwatch" level="INFO" additivity="false">
+  		<appender-ref ref="STDOUT" />
+  		<!-- 
+  		<appender-ref ref="FILE" />
+  		-->
+  	</logger>
+  	
+  	<logger name="work" level="WARN" additivity="false">
   		<appender-ref ref="STDOUT" />
   		<!-- 
   		<appender-ref ref="FILE" />

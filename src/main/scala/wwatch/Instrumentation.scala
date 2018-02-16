@@ -146,8 +146,8 @@ class Instrumentation extends Actor {
   if(bindPort != 0) {
   val bindFuture = Http().bindAndHandle(route, "0.0.0.0", config.getInt("wwatch.server.instrumentationListenPort"))
     bindFuture.onComplete {
-      case Success(b) =>
-        log.info("Bound")
+      case Success(binding) =>
+        log.info("Instrumentation bound to " + binding.localAddress)
       case Failure(e) =>
          log.error(e.getMessage)
     }

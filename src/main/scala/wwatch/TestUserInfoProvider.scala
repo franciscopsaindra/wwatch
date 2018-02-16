@@ -44,8 +44,8 @@ class TestUserInfoProvider extends Actor {
   val bindFuture = Http().bindAndHandle(route, "0.0.0.0", 11111)
   
   bindFuture.onComplete {
-    case Success(b) =>
-      log.info("Bound")
+    case Success(binding) =>
+      log.info("TestUserInfoProvider bound to " + binding.localAddress)
     case Failure(e) =>
        log.error(e.getMessage)
   }
