@@ -50,15 +50,19 @@ class TestWebProvider extends Actor {
       actorRef ! TestResponse
   }
   
-  val route = get {
-    log.debug("Web request received")
-    onComplete(self ? TestRequest) {
-      case Success(_) =>
-        complete(HttpEntity(MediaTypes.`image/jpeg`.toContentType, Content.getObject("test.jpg")))
-      case Failure(ex) =>
-        log.error(ex, ex.getMessage)
-        complete(StatusCodes.ServiceUnavailable)
+  val route = path("/delay") {
+    get {
+      onComplete(self ? TestRequest) {
+        case Success(_) =>
+          complete(HttpEntity(MediaTypes.`image/jpeg`.toContentType, Content.getObject("test.jpg")))
+        case Failure(ex) =>
+          log.error(ex, ex.getMessage)
+          complete(StatusCodes.ServiceUnavailable)
+      }
     }
+  } ~ 
+  get {
+      complete(HttpEntity(MediaTypes.`image/jpeg`.toContentType, Content.getObject("test.jpg")))
   }
 
   val bindFuture = Http().bindAndHandle(route, "0.0.0.0", config.getInt("wwatch.testWeb.listenPort"))
