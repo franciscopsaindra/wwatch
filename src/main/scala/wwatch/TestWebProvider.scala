@@ -50,7 +50,7 @@ class TestWebProvider extends Actor {
       actorRef ! TestResponse
   }
   
-  val route = path("/delay") {
+  val route = path("delay") {
     get {
       onComplete(self ? TestRequest) {
         case Success(_) =>
