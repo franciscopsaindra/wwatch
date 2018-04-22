@@ -18,22 +18,26 @@ object Content {
   
   val config = ConfigFactory.load()
   
-  // The content directory will be the one where the resource "redirect.html" is located  
-  val contentDirectory = new File(getClass.getClassLoader.getResource("redirect.html").getPath).getParentFile
+  // The content directory will be the one where the resource "redirect.html" is located, or the one specified
+  val contentDirectory = {
+    if(config.hasPath("wwatch.content.directory") && new File(config.getString("wwatch.content.directory")).exists) new File(config.getString("wwatch.content.directory"))
+    else new File(getClass.getClassLoader.getResource("redirect.html").getPath).getParentFile
+  }
   
   // Map(String -> (ByteString, ContentType)]
-  val objectMap = getObjectMap(contentDirectory, contentDirectory)
+  val objectMap = getObjectMap(contentDirectory, contentDirectory).toMap
   
   /**
-   * Get iteratively the contents of the files to serve as a map of paths to ByteStrings
+   * Get iteratively the contents of the Content directory
    */
-  def getObjectMap(contentDir: File, baseDir : File) : Map[String, (ByteString, ContentType)] = {
+  def getObjectMap(contentDir: File, baseDir : File) : Seq[(String, (ByteString, ContentType))] = {
     val basePath = baseDir.toURI
-    val maps = for {
-      file <- contentDir.listFiles.toList
-      partialMap = if(file.isFile) Map(file.toURI.toString.replaceFirst(basePath.toString, "") -> (ByteString.fromArray(Files.readAllBytes(Paths.get(file.getPath))), getContentType(file.getPath)  )   ) else getObjectMap(file, baseDir)
-    } yield partialMap
-    maps.foldLeft(Map[String, (ByteString, ContentType)]())((acc, item) => (acc ++ item))
+    val files = contentDir.listFiles.toList
+    files.flatMap { file => {
+        if(file.isFile) Seq(  file.toURI.toString.replaceFirst(basePath.toString, "") -> (ByteString.fromArray(Files.readAllBytes(Paths.get(file.getPath))), getContentType(file.getPath)))
+        else getObjectMap(file, baseDir)
+      }
+    }
   }
   
   // Gets the object bytes as a ByteString
@@ -54,8 +58,7 @@ object Content {
       if(targetPos == -1) page
       else {
         val (head, tail) = page.splitAt(targetPos)
-        val toReply = head.concat(ByteString(url)).concat(tail.drop(4))
-        toReply
+        head.concat(ByteString(url)).concat(tail.drop(4))
       } 
   }
   

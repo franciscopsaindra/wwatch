@@ -12,7 +12,8 @@ libraryDependencies ++=
     "com.typesafe.akka" %% "akka-stream"     % "2.5.8",
     "com.typesafe.akka" %% "akka-slf4j"      % "2.5.8",
     "com.typesafe.akka" %% "akka-testkit"    % "2.5.8",
-	"com.typesafe.akka" %% "akka-http"		 % "10.0.11",
+	"com.typesafe.akka" %% "akka-http"		 % "10.1.1",
+    "com.typesafe.akka" %% "akka-http-spray-json" % "10.1.1",
 	"io.spray"		 	%% "spray-json" 	 % "1.3.3",
     "org.scalatest"     %% "scalatest"       % "3.0.0",
     "ch.qos.logback" 	%  "logback-classic" % "1.2.3"

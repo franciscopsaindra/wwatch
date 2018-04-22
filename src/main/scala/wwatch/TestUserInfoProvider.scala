@@ -12,12 +12,13 @@ import spray.json._
 import DefaultJsonProtocol._ 
 
 import Actions._
+import UserDataMgr.UserData
 
-object TestUserInfoProvider {
-  def props() = Props(new TestUserInfoProvider())
+object TestUserDataProvider {
+  def props(defaultUserData: UserData) = Props(new TestUserDataProvider(defaultUserData))
 }
   
-class TestUserInfoProvider extends Actor {
+class TestUserDataProvider(defaultUserData: UserData) extends Actor {
   
   val log = Logging.getLogger(context.system, this)
   
@@ -25,15 +26,15 @@ class TestUserInfoProvider extends Actor {
     case _ => None
   }
   
-  val route = path("userInfo") {
+  val route = path("userData") {
     get {
-      log.debug("UserInfo request received")
+      log.debug("UserData request received")
       val jsonResponse = JsObject(
-          "isBlocked" -> false.toJson,
-          //"specialService" -> JsString("acs"),
-          "pubCampaign" -> JsString("adviser")
-          )
-          
+      "clientId" -> JsString(defaultUserData.clientId),
+      "policy" -> JsNumber(defaultUserData.policy),
+      "inline" -> JsBoolean(defaultUserData.inline),
+      "pageName" -> JsString(defaultUserData.pageName.getOrElse(""))
+      )
       complete(HttpEntity(ContentTypes.`application/json`, jsonResponse.prettyPrint))
     }
   } 
@@ -45,7 +46,7 @@ class TestUserInfoProvider extends Actor {
   
   bindFuture.onComplete {
     case Success(binding) =>
-      log.info("TestUserInfoProvider bound to " + binding.localAddress)
+      log.info("TestUserDataProvider bound to " + binding.localAddress)
     case Failure(e) =>
        log.error(e.getMessage)
   }

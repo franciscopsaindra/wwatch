@@ -1,0 +1,2 @@
+# List of url regular expressions that will not be decorated
+serving-sys

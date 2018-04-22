@@ -1,1 +1,0 @@
-# List of host names whose content will always be blocked (HTTP Forbidden)

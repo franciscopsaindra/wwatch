@@ -1,0 +1,1 @@
+# List of url regular expressions that will always be proxied

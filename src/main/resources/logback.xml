@@ -1,15 +1,29 @@
 <configuration debug="false" scan="true">
-	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
-	    <file>log/wwatch.log</file>
-	    <encoder>
-      		<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
-    	</encoder>
-
-	</appender>
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>
       		<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    	</encoder>
+	</appender>
+	
+	<appender name="LOGFILE" class="ch.qos.logback.core.FileAppender">
+	    <file>log/wwatch.log</file>
+	    <encoder>
+      		<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    	</encoder>
+	</appender>
+	
+	<appender name="ACTIONFILE" class="ch.qos.logback.core.FileAppender">
+	    <file>log/actions.log</file>
+	    <encoder>
+      		<pattern>%d{HH:mm:ss.SSS}, %msg%n</pattern>
+    	</encoder>
+	</appender>
+	
+	<appender name="PROXYFILE" class="ch.qos.logback.core.FileAppender">
+	    <file>log/proxy.log</file>
+	    <encoder>
+      		<pattern>%d{HH:mm:ss.SSS}, %msg%n</pattern>
     	</encoder>
 	</appender>
 
@@ -20,18 +34,19 @@
     	-->
   	</root>
   	
-  	<logger name="wwatch" level="INFO" additivity="false">
+  	<logger name="wwatch" level="DEBUG" additivity="false">
   		<appender-ref ref="STDOUT" />
   		<!-- 
   		<appender-ref ref="FILE" />
   		-->
   	</logger>
   	
-  	<logger name="work" level="WARN" additivity="false">
-  		<appender-ref ref="STDOUT" />
-  		<!-- 
-  		<appender-ref ref="FILE" />
-  		-->
+  	<logger name="action" level="INFO" additivity="false">
+  		<appender-ref ref="ACTIONFILE" />
+  	</logger>
+  	
+  	<logger name="proxy" level="INFO" additivity="false">
+  		<appender-ref ref="PROXYFILE" />
   	</logger>
 
 </configuration>

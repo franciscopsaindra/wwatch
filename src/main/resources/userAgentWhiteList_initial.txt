@@ -1,0 +1,2 @@
+# Regular expressions that, if matched in User-Agent, will force proxy
+TV
