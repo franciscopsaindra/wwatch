@@ -15,34 +15,9 @@ import spray.json._
 import scala.concurrent.duration._
 
 object MyJsonProtocol extends DefaultJsonProtocol {
-    implicit object userDataFormat extends RootJsonFormat[UserData]  {
-      def write(v: UserData) = {
-        JsObject()
-      }
-      
-  /*
-   * Expects JSON like this
-   * {
-   *  clientId: <value>,
-   *  policy: <number>,
-   *  inline: true|false,
-   * 	pageName: <string>
-   * }
-   * 
-   * A custom JsonProtocol is needed because the case class to serialize includes fields and methods not in the constructor
-   */
-      
-      def read(v: JsValue) = {
-        val fields = v.asJsObject.fields
-        UserData(
-          fields.get("clientId").get.convertTo[String],
-          fields.get("policy").get.convertTo[Int],
-          fields.get("inline").get.convertTo[Boolean],
-          fields.get("pageName").get.convertTo[Option[String]]
-        )
-      }
-    }
+  implicit val myFormat = jsonFormat4(UserData)
 }
+
 
 object RestUserDataMgr {
   def props(instrumentationActor: ActorRef) = Props(new RestUserDataMgr(instrumentationActor))
@@ -98,7 +73,7 @@ class RestUserDataMgr(instrumentationActor: ActorRef) extends UserDataMgr {
         
       (ipAddressMap.get(ipAddress) match {
         case None =>
-          if(userDataURL.contains("http")){
+          if(userDataURL.contains("http")){   
             (for {
               response <- Http(context.system).singleRequest(HttpRequest(uri = userDataURL.replaceAll("$ipAddress", ipAddress)))
               jsonString <- Unmarshal(response).to[String]

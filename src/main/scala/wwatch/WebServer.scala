@@ -62,7 +62,11 @@ class WebServer extends Actor {
   val instrumentationActor = actorSystem.actorOf(Instrumentation.props, "Instrumentation")
   
   // Start UserData retriever
-  val userDataMgrActor = actorSystem.actorOf(RestUserDataMgr.props(instrumentationActor), "UserData")
+  val userDataMgrActor = 
+    if(config.getString("wwatch.userDataMgr.implementation") == "radius")
+      actorSystem.actorOf(RadiusUserDataMgr.props(instrumentationActor), "UserData")
+    else 
+      actorSystem.actorOf(RestUserDataMgr.props(instrumentationActor), "UserData")
   
   // Start mokeup web server
   if(config.getBoolean("wwatch.testWeb.enable")) actorSystem.actorOf(TestWebProvider.props, "TestWebProvider")

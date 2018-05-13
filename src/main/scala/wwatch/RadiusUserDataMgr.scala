@@ -55,6 +55,10 @@ class RadiusUserDataMgr(instrumentationActor: ActorRef) extends UserDataMgr {
     context.become(ready(sender))
     
     // TODO: Add case for error
+          
+    // TODO: Clean this
+    case x: Any =>
+      log.info("Received {}", x.getClass().getName)
   }
   
   def ready(udpEndPoint: ActorRef): Receive = {
